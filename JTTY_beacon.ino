@@ -1,7 +1,7 @@
 ﻿/**    
  * ============================================================================    
  *  JTTY_beacon.ino — пример JTTY-передатчика на RP2040  
- *  ver.1.01 от 2026-10-16, автор RU0AOG  
+ *  ver.1.05 от 2026-10-16, автор RU0AOG  
  * ============================================================================    
  *  
  *  ОПИСАНИЕ РАБОТЫ  
@@ -19,8 +19,8 @@
     
 // ============================ ГЛОБАЛЬНЫЕ ПАРАМЕТРЫ ===========================    
   
-char JTTY_MESSAGE[] = "CQ RU0AOG CQ TESTING BEACON";    // Передаваемая фраза (до 80 символов)  
-uint32_t               JTTY_FREQ_HZ = 10001500UL;       // Несущая JTTY-маяка: центр полосы сигнала, Гц.   
+char JTTY_MESSAGE[] = "CQ CQ TESTING BEACON";           // Передаваемая фраза (до 80 символов)  
+uint32_t               JTTY_FREQ_HZ = 14090000UL;       // Несущая JTTY-маяка: центр полосы сигнала, Гц.   
 static const uint8_t     PIN_RF_OUT = 15;               // Пин ВЧ-выхода PIO-DDS    
 static const uint8_t PIN_USR_BUTTON = 24;               // Пин кнопки USR (INPUT_PULLUP)    
 static const uint8_t PIN_LED_BUTTON = 25;               // Пин индикаторного светодиода  
@@ -130,11 +130,27 @@ void loop()
     }    
     btn_prev = btn_now;  
   
-    // --- Триггер 2: любая команда из Serial ---  
+    // --- Триггер 2: команда из Serial — текст уходит в эфир ---  
     if (Serial.available() > 0) {  
         String cmd = Serial.readStringUntil('\n');  
         cmd.trim();  
-        Serial.printf("[RX] Команда: \"%s\" -> старт передачи\n", cmd.c_str());  
-        start_tx("serial");  
-    }  
+        cmd.toUpperCase();  
+    
+        // Оставляем только символы алфавита JTTY  
+        String clean;  
+        for (unsigned int i = 0; i < cmd.length(); i++) {  
+            if (strchr(JTTY_ALPHABET, cmd[i]) != NULL) clean += cmd[i];  
+        }  
+        clean.trim();   // схлопывание пробелов сделает normalize_jtty в кодеке  
+    
+        if (clean.length() == 0) {  
+            // ни одного допустимого символа — ничего не делаем  
+        } else {  
+            Serial.printf("[RX] \"%s\"\n", clean.c_str());   // эхо очищенной строки  
+            digitalWrite(PIN_LED_BUTTON, HIGH);  
+            jtty_transmit(clean.c_str());                    // передаём введённый текст  
+            digitalWrite(PIN_LED_BUTTON, LOW);  
+            while (Serial.available()) Serial.read();        // сброс накопленного RX  
+        }  
+    }
 }

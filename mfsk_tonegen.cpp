@@ -1231,10 +1231,10 @@ bool tonegen_init(uint8_t pin, uint32_t base_hz, double step_hz,
     sm_config_set_set_pins(&c, tg_pin, 1);  
   
     pio_gpio_init(tg_pio, tg_pin);  
-    pio_sm_set_consecutive_pindirs(tg_pio, tg_sm, tg_pin, 1, true);  
-  
+    pio_sm_set_consecutive_pindirs(tg_pio, tg_sm, tg_pin, 1, false);  // пин в Z — несущая ВЫКЛ
+
     pio_sm_init(tg_pio, tg_sm, tg_offset, &c);  
-    pio_sm_set_enabled(tg_pio, tg_sm, true);  
+    pio_sm_set_enabled(tg_pio, tg_sm, true);                          // SM крутится, выход отключён 
   
     // Привязка сетки к миллигерцам  
     tg_base_mhz = (uint64_t)base_hz * 1000ULL;  

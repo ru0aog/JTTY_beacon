@@ -35,7 +35,7 @@
 Перейдите на страницу **[GitHub Releases](https://github.com/ru0aog/JTTY_beacon/releases)**. При создании каждого нового тега версии (`v*`) робот автоматически компилирует код и прикрепляет чистый файл **`.uf2`** в раздел *Assets*.
 
 ### 2. Свежие сборки «на лету»
-Если вы хотите протестировать самые последние изменения, перейдите на вкладку **[GitHub Actions](https://github.com/ru0aog/JTTY_beacon/actions)**, выберите самый верхний успешный запуск сборки и скачайте архив артефакта **`arduino-rp2040-uf2`** из нижней части страницы.
+Если вы хотите протестировать самые последние изменения, перейдите на вкладку **[GitHub Actions](https://github.com/ru0aog/JTTY_beacon/actions)**, выберите самый верхний успешный запуск сборки и скачайте архив артефакта **`jtty-beacon-uf2`** из нижней части страницы.
 
 ### Инструкция по прошивке:
 1. Зажмите аппаратную кнопку **BOOTSEL** на вашей плате (RP2040 / RP2040-Zero).
@@ -69,7 +69,7 @@
 ## 📚 Документация и ссылки
 
 * Полная база знаний проекта, подробное описание регистров DDS и схемы подключения модулей доступны на **[DeepWiki](https://deepwiki.com/ru0aog/JTTY_beacon)**.
-* Исходный код автоматизации сборки: [.github/workflows/jtty_beacon_build.yml](./.github/workflows/jtty_beacon_build.yml).
+* Исходный код автоматизации сборки [.github/workflows/jtty_beacon_build.yml](./.github/workflows/jtty_beacon_build.yml).
 
 ---
 
@@ -83,5 +83,4 @@
    - `jtty_source_codec.f90` — атомы источника, ALPHABET, `finish_struct()`;  
    - `tbcc.f90` — CRC-12 (`0x80F`) и tail-biting свёртка K=10, r=1/2, полиномы `0o1167`/`0o1545`, Gray-маппинг дибитов;  
    - `nhash.c` — Jenkins hashlittle (токены `CQ_aaaa`/`QRZ_aaaa`).  
-2. Библиотека `mfsk_tonegen.h` / `mfsk_tonegen.cpp` — оригинальный код автора проекта (PIO-DDS генератор MFSK-тонов для RP2040), стороннего  
-   кода не содержит.
+2. Библиотека `mfsk_tonegen.h` / `mfsk_tonegen.cpp` — оригинальный код автора проекта (PIO-DDS генератор MFSK-тонов для RP2040), стороннего кода не содержит.

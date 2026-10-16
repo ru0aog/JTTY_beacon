@@ -1,0 +1,63 @@
+name: Arduino RP2040 Build
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # Позволяет запускать сборку вручную одной кнопкой
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Arduino CLI
+      uses: arduino/setup-arduino-cli@v2
+
+    # НАСТРОЙКА КЭША: Сохраняем папки с ядром плат и библиотеками
+    - name: Cache Arduino Directories
+      uses: actions/cache@v4
+      id: arduino-cache
+      with:
+        path: |
+          ~/.arduino15
+          ~/Arduino/libraries
+        key: ${{ runner.os }}-arduino-${{ hashFiles('**/*.ino', '.github/workflows/*.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-arduino-
+
+    - name: Install Raspberry Pi Pico Core
+      # Установка запустится только если кэш НЕ был найден (cache-hit != 'true')
+      if: steps.arduino-cache.outputs.cache-hit != 'true'
+      run: |
+        arduino-cli core update-index --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+        arduino-cli core install rp2040:rp2040 --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+
+    - name: Install Libraries
+      # Установка запустится только если кэш НЕ был найден
+      if: steps.arduino-cache.outputs.cache-hit != 'true'
+      run: |
+        arduino-cli lib install "Adafruit TinyUSB Library"
+
+    - name: Compile Sketch
+      run: |
+        # Компилируем проект. Теперь всё настроено правильно, и сборка пройдёт штатно.
+        arduino-cli compile --fqbn rp2040:rp2040:rpipico:usbstack=tinyusb,flash=2097152_1048576 --output-dir ./build .
+
+    - name: Upload UF2 Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: jtty-beacon-uf2
+        path: ./build/*.uf2
+
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ./build/*.uf2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

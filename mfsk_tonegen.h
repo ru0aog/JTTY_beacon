@@ -28,6 +28,22 @@
 #include <stdint.h>  
 #include <stdbool.h>  
 #include <Arduino.h>  
+
+/* Паспортный номинал кварца; коррекция в ppb задаётся сеттером  
+ * (замена Flash-хранению [XOSC_PPB] из родительского проекта). */  
+#define TG_XOSC_NOMINAL_HZ     12000000ULL   // кварц 12.000000 МГц  
+#define TG_XOSC_DEFAULT_PPB    (+18000LL)    // дефолтная коррекция в bpm
+  
+extern int32_t tg_xosc_corr_ppb;  
+  
+/* Скорректированная частота кварца — считается в рантайме. */  
+static inline uint64_t tg_calibrated_xosc_hz(void) {  
+    // Всё в int64: знак коррекции должен сохраниться.  
+    int64_t hz = (int64_t)TG_XOSC_NOMINAL_HZ +  
+                 (int64_t)TG_XOSC_NOMINAL_HZ * (int64_t)tg_xosc_corr_ppb / 1000000000LL;  
+    return (hz > 0) ? (uint64_t)hz : (uint64_t)TG_XOSC_NOMINAL_HZ;  
+}  
+void tonegen_set_xosc_corr_ppb(int32_t ppb);  
   
 /* ------------------------- Лимиты частотного плана ------------------------ */  
 #define TG_CLK_SYS_NOMINAL_HZ  133000000ULL  // электрический номинал без вольтмода  
@@ -87,22 +103,6 @@ struct TgToneParams {
   
 #define TONEGEN_MAX_TONES  64  
 #define TG_TONE_NONE      255  
-  
-/* Паспортный номинал кварца; коррекция в ppb задаётся сеттером  
- * (замена Flash-хранению [XOSC_PPB] из родительского проекта). */  
-#define TG_XOSC_NOMINAL_HZ     12000000ULL   // кварц 12.000000 МГц  
-#define TG_XOSC_DEFAULT_PPB    (+25000LL)    // дефолтная коррекция  
-  
-extern int32_t tg_xosc_corr_ppb;  
-  
-/* Скорректированная частота кварца — считается в рантайме. */  
-static inline uint64_t tg_calibrated_xosc_hz(void) {  
-    // Всё в int64: знак коррекции должен сохраниться.  
-    int64_t hz = (int64_t)TG_XOSC_NOMINAL_HZ +  
-                 (int64_t)TG_XOSC_NOMINAL_HZ * (int64_t)tg_xosc_corr_ppb / 1000000000LL;  
-    return (hz > 0) ? (uint64_t)hz : (uint64_t)TG_XOSC_NOMINAL_HZ;  
-}  
-void tonegen_set_xosc_corr_ppb(int32_t ppb);  
   
 extern TgToneParams __attribute__((section(".time_critical.tg_tones"))) tg_tones[TONEGEN_MAX_TONES];  
   

@@ -69,7 +69,7 @@
 ## 📚 Документация и ссылки
 
 * Полная база знаний проекта, подробное описание регистров DDS и схемы подключения модулей доступны на **[DeepWiki](https://deepwiki.com/ru0aog/JTTY_beacon)**.
-* Исходный код автоматизации сборки: [.github/workflows/arduino_build.yml](./.github/workflows/arduino_build.yml).
+* Исходный код автоматизации сборки: [.github/workflows/jtty_beacon_build.yml.yml](./.github/workflows/jtty_beacon_build.yml.yml).
 
 ---
 
@@ -77,8 +77,14 @@
 
 * **Автор проекта:** [@ru0aog](https://github.com/ru0aog)
 * Проект является открытым. Исходный код распространяется под лицензией **GPLv3** (см. файл [LICENSE](LICENSE)).  
-* **Уведомление об авторских правах третьих лиц:**
-1. модули `olivia_modem.cpp` и `thor_modem.cpp` содержат код, портированный из проекта [fldigi](https://sourceforge.net/projects/fldigi/) (GPLv3) — алгоритмы MFSK/Walsh-кодирования и RSID (© Pawel Jalocha SP9VRC, David Freese W1HKJ).
-2. Varicode в `thor_modem.cpp` реализован по спецификации IZ8BLY / ZL1BPU MFSK standard.
-3. Общий MFSK-движок `thor_modem.cpp` (THOR, MFSK16, DominoEX 8, FSQ) и генератор RSID портированы из файлов fldigi: `thor/thor.cxx`, `mfsk/mfsk.cxx`, `mfsk/mfskvaricode.cxx`, `mfsk/interleave.cxx`, `thor/thorvaricode.cxx`, `dominoex/dominoex.cxx`, `dominoex/dominovar.cxx`, `fsq/fsq.cxx`, `fsq/fsq_varicode.cxx`, `rsid/rsid.cxx`, `rsid/rsid_defs.cxx`.
-4. JTTY-модем (`jtty_modem.cpp`) — порт протокола JTTY из **WSJT-X 3.3** (© Joe Taylor K1JT и соавт., GPLv2): упаковка сообщений `pack_jtty`, `pack28`/`ihashcall` из `packjt77`, свёрточный код TBCC K=10 и CRC-12 из `tbcc.f90`.
+* **Уведомление об авторских правах третьих лиц:**  
+1. Библиотека `jtty_codec.h` / `jtty_codec.cpp` — порт протокола JTTY из  
+   **WSJT-X 3.3** (GPLv3, © Joe Taylor K1JT, Steve Franke K9AN и соавт.):  
+   - `packjt77.f90` — `pack28()`, `ihashcall()`, токены CQ/QRZ/DE;  
+   - `jtty_source_codec.f90` — атомы источника, ALPHABET, `finish_struct()`;  
+   - `tbcc.f90` — CRC-12 (`0x80F`) и tail-biting свёртка K=10, r=1/2,  
+     полиномы `0o1167`/`0o1545`, Gray-маппинг дибитов;  
+   - `nhash.c` — Jenkins hashlittle (токены `CQ_aaaa`/`QRZ_aaaa`).  
+2. Библиотека `mfsk_tonegen.h` / `mfsk_tonegen.cpp` — оригинальный код  
+   автора проекта (PIO-DDS генератор MFSK-тонов для RP2040), стороннего  
+   кода не содержит.

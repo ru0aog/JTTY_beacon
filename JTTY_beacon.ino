@@ -146,7 +146,6 @@ void loop()
         if (clean.length() == 0) {  
             // ни одного допустимого символа — ничего не делаем  
         } else {  
-            Serial.printf("[RX] \"%s\"\n", clean.c_str());   // эхо очищенной строки  
             digitalWrite(PIN_LED_BUTTON, HIGH);  
             jtty_transmit(clean.c_str());                    // передаём введённый текст  
             digitalWrite(PIN_LED_BUTTON, LOW);  

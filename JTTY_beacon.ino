@@ -113,7 +113,7 @@ void setup()
     
     Serial.printf("[JTTY] Готов. Центр: %lu Гц, Текст: \"%s\"\n",    
                   JTTY_FREQ_HZ, JTTY_MESSAGE);  
-    Serial.println(F("[JTTY] Отправьте любую команду в порт для запуска передачи"));  
+    Serial.println(F("[JTTY] Отправьте любую команду в порт (или нажмите кнопку USR на плате) для запуска передачи"));  
 }    
     
 void loop()    

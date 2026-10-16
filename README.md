@@ -69,7 +69,7 @@
 ## 📚 Документация и ссылки
 
 * Полная база знаний проекта, подробное описание регистров DDS и схемы подключения модулей доступны на **[DeepWiki](https://deepwiki.com/ru0aog/JTTY_beacon)**.
-* Исходный код автоматизации сборки: [.github/workflows/jtty_beacon_build.yml.yml](./.github/workflows/jtty_beacon_build.yml.yml).
+* Исходный код автоматизации сборки: [.github/workflows/jtty_beacon_build.yml](./.github/workflows/jtty_beacon_build.yml).
 
 ---
 
@@ -78,13 +78,10 @@
 * **Автор проекта:** [@ru0aog](https://github.com/ru0aog)
 * Проект является открытым. Исходный код распространяется под лицензией **GPLv3** (см. файл [LICENSE](LICENSE)).  
 * **Уведомление об авторских правах третьих лиц:**  
-1. Библиотека `jtty_codec.h` / `jtty_codec.cpp` — порт протокола JTTY из  
-   **WSJT-X 3.3** (GPLv3, © Joe Taylor K1JT, Steve Franke K9AN и соавт.):  
+1. Библиотека `jtty_codec.h` / `jtty_codec.cpp` — порт протокола JTTY из **WSJT-X 3.3** (GPLv3, © Joe Taylor K1JT, Steve Franke K9AN и соавт.):  
    - `packjt77.f90` — `pack28()`, `ihashcall()`, токены CQ/QRZ/DE;  
    - `jtty_source_codec.f90` — атомы источника, ALPHABET, `finish_struct()`;  
-   - `tbcc.f90` — CRC-12 (`0x80F`) и tail-biting свёртка K=10, r=1/2,  
-     полиномы `0o1167`/`0o1545`, Gray-маппинг дибитов;  
+   - `tbcc.f90` — CRC-12 (`0x80F`) и tail-biting свёртка K=10, r=1/2, полиномы `0o1167`/`0o1545`, Gray-маппинг дибитов;  
    - `nhash.c` — Jenkins hashlittle (токены `CQ_aaaa`/`QRZ_aaaa`).  
-2. Библиотека `mfsk_tonegen.h` / `mfsk_tonegen.cpp` — оригинальный код  
-   автора проекта (PIO-DDS генератор MFSK-тонов для RP2040), стороннего  
+2. Библиотека `mfsk_tonegen.h` / `mfsk_tonegen.cpp` — оригинальный код автора проекта (PIO-DDS генератор MFSK-тонов для RP2040), стороннего  
    кода не содержит.

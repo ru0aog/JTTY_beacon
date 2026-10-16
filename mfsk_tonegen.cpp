@@ -385,9 +385,10 @@ void tonegen_clk_boost_enter(unsigned int target_freq_hz) {
     // 2. Сравнение метрик  
     uint64_t target_mhz = (uint64_t)target_freq_hz * 1000ULL;  
     TgToneParams dummy;  
-    uint64_t metric_opt = tg_pll_metric_verbose(opt.clk_sys_hz, target_mhz, &(MetricBreakdown){0}, &dummy);  
+    MetricBreakdown brk_opt;  
+    uint64_t metric_opt = tg_pll_metric_verbose(opt.clk_sys_hz, target_mhz, &brk_opt, &dummy);  
     MetricBreakdown brk_cur;  
-    uint64_t metric_cur = tg_pll_metric_verbose(current_clk_sys_hz, target_mhz, &brk_cur, &dummy);  
+    uint64_t metric_cur = tg_pll_metric_verbose(current_clk_sys_hz, target_mhz, &brk_cur, &dummy);
   
     if (metric_opt >= metric_cur || opt.clk_sys_hz == current_clk_sys_hz) {  
         cached_base_freq_hz = target_freq_hz;  

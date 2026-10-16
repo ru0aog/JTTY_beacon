@@ -13,9 +13,9 @@
  * ============================================================================    
  */    
   
-#include <Arduino.h>    
-#include "jtty_codec.h"        // Протокол (пакер и FEC)  
-#include "mfsk_tonegen.h"      // Аппаратный PIO-DDS драйвер  
+#include <Arduino.h>
+#include "jtty_codec.h"        // Протокол (пакер и FEC)
+#include "mfsk_tonegen.h"      // Аппаратный PIO-DDS драйвер
     
 // ============================ ГЛОБАЛЬНЫЕ ПАРАМЕТРЫ ===========================    
   
@@ -36,7 +36,7 @@ static void jtty_transmit(const char* text)
 {    
     // 1. Упаковка текста в кадры JTTY  
     JttyFrameList fl;    
-    if (!jtty_pack_message(text, &fl, JTTY_EXCHANGE_UNKNOWN, -1)) {    
+    if (!jtty_pack_message(text, &fl, 0, -1)) { 
         Serial.println(F("[JTTY] Ошибка упаковки сообщения"));    
         return;    
     }    

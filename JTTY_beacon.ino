@@ -1,33 +1,33 @@
 ﻿/**  
  * ============================================================================  
- *  jtty_tx_example.ino — пример JTTY-передатчика на RP2040 (ИСПРАВЛЕННЫЙ)  
+ *  JTTY_beacon.ino — пример JTTY-передатчика на RP2040
+ *  ver.1.00 от 2026-10-16, автор RU0AOG
+ * ============================================================================  
+ *
+ *  ОПИСАНИЕ РАБОТЫ
+ *  - по нажатию кнопки USR (пин 23) в эфир уходит заранее составленное сообщение
+ *  - сообщение хранится в переменной JTTY_MESSAGE[]
+ *  - частота определяется переменной JTTY_FREQ_HZ
+ *  - пин, на котором генерируется радиосигнал назначается переменной PIN_RF_OUT
  * ============================================================================  
  */  
-  
+
 #include <Arduino.h>  
 #include "jtty_codec.h"        // Протокол (пакер и FEC)
 #include "mfsk_tonegen.h"      // Аппаратный PIO-DDS драйвер
   
 // ============================ ГЛОБАЛЬНЫЕ ПАРАМЕТРЫ ===========================  
   
-// Несущая JTTY-маяка: центр полосы сигнала, Гц.  
-uint32_t JTTY_FREQ_HZ = 10000000UL;            // 10 МГц  
-  
-// Передаваемая фраза (до 80 символов)
-char JTTY_MESSAGE[] = "CQ RU0AOG CQ TESTING BEACON";  
-  
-// Пин кнопки USR (INPUT_PULLUP)  
-static const uint8_t PIN_USR_BUTTON = 15;  
-  
-// Пин ВЧ-выхода PIO-DDS  
-static const uint8_t PIN_RF_OUT = 7;  
-  
-// !!! ВНИМАНИЕ: Константы JTTY_BAUD_HZ, JTTY_SYMBOL_US, JTTY_NTONES, !!!
-// !!! JTTY_NSYMS и JTTY_CENTER_OFFSET удалены отсюда, так как они   !!!
-// !!! автоматически импортируются из "jtty_codec.h"                 !!!
-  
+char JTTY_MESSAGE[] = "CQ RU0AOG CQ TESTING BEACON";    // Передаваемая фраза (до 80 символов)
+uint32_t               JTTY_FREQ_HZ = 10001500UL;       // Несущая JTTY-маяка: центр полосы сигнала, Гц. 
+static const uint8_t     PIN_RF_OUT = 15;               // Пин ВЧ-выхода PIO-DDS  
+static const uint8_t PIN_USR_BUTTON = 24;               // Пин кнопки USR (INPUT_PULLUP)  
+static const uint8_t PIN_LED_BUTTON = 25;               // Пин индикаторного светодиода
+
+
+
 // ============================ СЛУЖЕБНЫЙ КОД =================================  
-  
+
 /**  
  * Передать одну посылку JTTY: все кадры сообщения подряд.  
  */  
@@ -64,11 +64,17 @@ static void jtty_transmit(const char* text)
   
 void setup()  
 {  
-    Serial.begin(115200);  
-    delay(300);  
+    Serial.begin(115200);
+
+    // ожидание коннекта - до 5 сек
+    uint32_t timeout = millis();
+    while (!Serial && (millis() - timeout < 5000)) {
+    }
+
     Serial.println(F("\n[JTTY TX Beacon] Инициализация..."));  
   
-    pinMode(PIN_USR_BUTTON, INPUT_PULLUP);  
+    pinMode(PIN_USR_BUTTON, INPUT_PULLUP);
+    pinMode(PIN_LED_BUTTON, OUTPUT);
   
     // Расчет базовой частоты (f0) для нижнего тона сетки JTTY
     double f0 = (double)JTTY_FREQ_HZ - JTTY_CENTER_OFFSET;  
@@ -101,10 +107,12 @@ void loop()
     bool btn_now = digitalRead(PIN_USR_BUTTON);  
   
     if (btn_prev && !btn_now) {                // Детектируем нажатие (фронт вниз)
-        delay(30);                             // Программный антидребезг  
+        delay(30);                             // Программный антидребезг
         if (digitalRead(PIN_USR_BUTTON) == LOW) {  
+            digitalWrite(PIN_LED_BUTTON,HIGH);
             Serial.println(F("[USR] Кнопка нажата -> Старт передачи"));  
-            jtty_transmit(JTTY_MESSAGE);  
+            jtty_transmit(JTTY_MESSAGE);
+            digitalWrite(PIN_LED_BUTTON,LOW); 
         }  
     }  
     btn_prev = btn_now;  
